@@ -293,7 +293,7 @@ export function Bc08Simulator() {
   return (
     <div className="flex flex-col h-[calc(100vh-80px)] min-h-[600px] bg-gray-950 text-gray-100">
       <header className="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
-        <h1 className="font-semibold">BC08 Lua Simulator</h1>
+        <h1 className="font-semibold">BC08 Skill Simulator</h1>
         <span className="text-xs text-gray-500">API v0.1</span>
       </header>
 
