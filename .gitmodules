@@ -1,0 +1,3 @@
+[submodule "public/skills/hammer-claw-skills-lab"]
+	path = public/skills/hammer-claw-skills-lab
+	url = https://github.com/EdwinSong/hammer-claw-skills-lab.git
