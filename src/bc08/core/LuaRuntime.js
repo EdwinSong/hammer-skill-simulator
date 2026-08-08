@@ -208,19 +208,28 @@ export class LuaRuntime {
   netFetch(method, url, options, callbackRef) {
     if (!this.running) return;
 
-    try {
-      const parsed = new URL(url);
-      if (this.allowedHosts.length > 0 && !this.allowedHosts.some(h => parsed.hostname.endsWith(h))) {
-        this.log('warn', `[net] blocked: ${method} ${url} (host not allowed)`);
-        this.invokeCallback(callbackRef, [0, `Host not allowed: ${parsed.hostname}`, {}]);
+    const isRelative = url.startsWith('/');
+    const isAbsolute = /^https?:\/\//i.test(url);
+
+    if (isAbsolute) {
+      try {
+        const parsed = new URL(url);
+        if (this.allowedHosts.length > 0 && !this.allowedHosts.some(h => parsed.hostname.endsWith(h))) {
+          this.log('warn', `[net] blocked: ${method} ${url} (host not allowed)`);
+          this.invokeCallback(callbackRef, [0, `Host not allowed: ${parsed.hostname}`, {}]);
+          return;
+        }
+        if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+          this.log('warn', `[net] blocked: ${method} ${url} (protocol ${parsed.protocol})`);
+          this.invokeCallback(callbackRef, [0, 'Only http/https allowed', {}]);
+          return;
+        }
+      } catch {
+        this.log('error', `[net] invalid URL: ${method} ${url}`);
+        this.invokeCallback(callbackRef, [0, 'Invalid URL', {}]);
         return;
       }
-      if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
-        this.log('warn', `[net] blocked: ${method} ${url} (protocol ${parsed.protocol})`);
-        this.invokeCallback(callbackRef, [0, 'Only http/https allowed', {}]);
-        return;
-      }
-    } catch {
+    } else if (!isRelative) {
       this.log('error', `[net] invalid URL: ${method} ${url}`);
       this.invokeCallback(callbackRef, [0, 'Invalid URL', {}]);
       return;
@@ -231,8 +240,8 @@ export class LuaRuntime {
 
     // Route absolute external URLs through the Vite dev-server CORS proxy
     // so Lua scripts can fetch any http/https endpoint in the browser.
+    // Relative URLs (e.g. /api/coingecko/...) are served by the dev-server proxy.
     // In Node.js test runners there is no base URL, so fetch directly.
-    const isAbsolute = /^https?:\/\//i.test(url);
     const isBrowser = typeof window !== 'undefined' && window.location != null;
     const fetchUrl = isAbsolute && isBrowser
       ? `/api/proxy?url=${encodeURIComponent(url)}`

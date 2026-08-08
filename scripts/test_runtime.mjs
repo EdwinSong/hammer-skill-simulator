@@ -1,4 +1,4 @@
-import { LuaRuntime } from './src/bc08/core/LuaRuntime.js'
+import { LuaRuntime } from '../src/bc08/core/LuaRuntime.js'
 
 const code = `
 local PAGE = 1
@@ -17,9 +17,9 @@ sys.log("info", "done")
 `
 
 const runtime = new LuaRuntime({
-  onLog: (level, msg) => console.log(`[${level}] ${msg}`),
-  onFrame: ({ pages, rgb }) => console.log('frame', Object.keys(pages)),
+  onLog: ({ level, message }) => console.log(`[${level}] ${message}`),
+  onScreenUpdate: ({ pages }) => console.log('frame', pages.map((p) => p.id)),
   onStop: () => console.log('stopped'),
 })
 
-runtime.start(code)
+runtime.run(code)

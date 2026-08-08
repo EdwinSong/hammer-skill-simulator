@@ -1,6 +1,14 @@
 import http from 'http'
-import { LuaRuntime } from './src/bc08/core/LuaRuntime.js'
+import { LuaRuntime } from '../src/bc08/core/LuaRuntime.js'
 import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const SKILL_PATH = path.resolve(
+  __dirname,
+  '../public/skills/hammer-claw-skills-lab/skills/miner_dashboard/scripts/miner_dashboard.lua'
+)
 
 const PORT = 3002
 
@@ -18,10 +26,7 @@ const server = http.createServer((req, res) => {
 })
 
 server.listen(PORT, async () => {
-  let code = fs.readFileSync(
-    '../skills/miner_dashboard/scripts/miner_dashboard.lua',
-    'utf8'
-  )
+  let code = fs.readFileSync(SKILL_PATH, 'utf8')
   code = code.replace(
     '/api/coingecko/simple/price?ids=bitcoin&vs_currencies=usd',
     `http://localhost:${PORT}/api/coingecko/simple/price?ids=bitcoin&vs_currencies=usd`
@@ -34,15 +39,14 @@ server.listen(PORT, async () => {
   code = code.replace('delay.delay_ms(30000)', 'delay.delay_ms(500)')
 
   const runtime = new LuaRuntime({
-    onLog: (level, msg) => console.log(`[${level}] ${msg}`),
-    onFrame: ({ pages, rgb }) => {
-      const page = pages[9]
-      if (page) {
-        const labels = Object.values(page.controls)
-          .filter((c) => c.type === 'label')
-          .map((c) => c.text)
-        console.log('[frame] labels:', labels.slice(0, 6).join(' | '))
-      }
+    onLog: ({ level, message }) => console.log(`[${level}] ${message}`),
+    onScreenUpdate: ({ pages }) => {
+      const page = pages.find((p) => p.id === 9)
+      if (!page) return
+      const labels = Object.values(page.controls)
+        .filter((c) => c.type === 'label')
+        .map((c) => c.text)
+      console.log('[frame] labels:', labels.slice(0, 6).join(' | '))
       const btcLabel = Object.values(page.controls).find((c) => c.type === 'label' && c.text === '12345')
       const netLabel = Object.values(page.controls).find((c) => c.type === 'label' && c.text === '111111')
       if (btcLabel) console.log('[frame] BTC price updated:', btcLabel.text)
@@ -51,7 +55,7 @@ server.listen(PORT, async () => {
     onStop: () => console.log('stopped'),
   })
 
-  runtime.start(code)
+  runtime.run(code)
 
   setTimeout(() => {
     runtime.stop()

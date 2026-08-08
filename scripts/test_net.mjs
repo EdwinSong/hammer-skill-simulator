@@ -1,4 +1,4 @@
-import { LuaRuntime } from './src/bc08/core/LuaRuntime.js'
+import { LuaRuntime } from '../src/bc08/core/LuaRuntime.js'
 
 const code = `
 local PAGE = 1
@@ -25,12 +25,12 @@ end
 `
 
 const runtime = new LuaRuntime({
-  onLog: (level, msg) => console.log(`[${level}] ${msg}`),
-  onFrame: ({ pages, rgb }) => console.log('frame', Object.keys(pages)),
+  onLog: ({ level, message }) => console.log(`[${level}] ${message}`),
+  onScreenUpdate: ({ pages }) => console.log('frame', pages.map((p) => p.id)),
   onStop: () => console.log('stopped'),
 })
 
-runtime.start(code)
+runtime.run(code)
 
 // Exit after a few seconds so the infinite loop does not hang the test.
 setTimeout(() => process.exit(0), 15000)
