@@ -32,9 +32,10 @@ function main() {
         || skill.files.find((f) => f.toLowerCase().endsWith('.lua'))
         || `${skill.id}.lua`
       const mainScript = `${localBase}/${luaFile.replace(/\\/g, '/')}`
+      const previewPath = path.join(SOURCE_SKILLS_DIR, skill.id, 'preview.png')
       return {
         ...skill,
-        preview_url: `${localBase}/preview.png`,
+        preview_url: fs.existsSync(previewPath) ? `${localBase}/preview.png` : null,
         main_script: mainScript,
         path: localBase,
       }
