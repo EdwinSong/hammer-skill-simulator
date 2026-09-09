@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-08T11:39:12Z",
+  "generated_at": "2026-09-09T04:43:12Z",
   "total": 3,
   "skills": [
     {
@@ -87,7 +87,7 @@
         "utility",
         "hardware"
       ],
-      "preview_url": null,
+      "preview_url": "/skills/hammer-claw-skills-lab/skills/watercooling_light_timer/preview.png",
       "devices": [
         "bc08-p4"
       ],
@@ -97,10 +97,31 @@
       "cap_groups": [
         "cap_lua"
       ],
-      "total_size": 12919,
-      "sha256": "214014e3934f526ec6d69cccd64d4a18cc4f57734324a98b2c556a96e4c67bf5",
+      "total_size": 47712,
+      "sha256": "2997978b7bde8fc7d4f13f6d728aa7a474589d1f092792087205b114bdf3c692",
       "files": [
         "SKILL.md",
+        "assets\\btn_minus2.png",
+        "assets\\btn_plus2.png",
+        "assets\\btn_start2.png",
+        "assets\\clock.png",
+        "assets\\color_dot_blue.png",
+        "assets\\color_dot_cyan.png",
+        "assets\\color_dot_pink.png",
+        "assets\\color_dot_purple.png",
+        "assets\\hours.png",
+        "assets\\led.png",
+        "assets\\light_ball.png",
+        "assets\\minutes.png",
+        "assets\\mode_btn.png",
+        "assets\\mode_btn_active.png",
+        "assets\\power_btn.png",
+        "assets\\preset_btn.png",
+        "assets\\preset_btn_active.png",
+        "assets\\ring_bg.png",
+        "assets\\timer.png",
+        "generate_preview.py",
+        "preview.png",
         "scripts\\watercooling_light_timer.lua"
       ],
       "main_script": "/skills/hammer-claw-skills-lab/skills/watercooling_light_timer/scripts/watercooling_light_timer.lua",

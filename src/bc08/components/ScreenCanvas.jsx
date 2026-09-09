@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { renderScreen, findControlAt, SCR_W, SCR_H, CANVAS_H, setImageRedrawCallback } from '../renderers/CanvasRenderer.js';
+import { renderScreen, findControlAt, SCR_W, CANVAS_H, setImageRedrawCallback } from '../renderers/CanvasRenderer.js';
 
 export function ScreenCanvas({ state, onClick, onCanvasReady }) {
   const canvasRef = useRef(null);
@@ -30,7 +30,7 @@ export function ScreenCanvas({ state, onClick, onCanvasReady }) {
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const scaleX = SCR_W / rect.width;
-    const scaleY = SCR_H / rect.height;
+    const scaleY = CANVAS_H / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
 
