@@ -205,7 +205,8 @@ export function findControlAt(state, x, y) {
     const controls = page.controls || [];
     for (let j = controls.length - 1; j >= 0; j--) {
       const c = controls[j];
-      if (c.type === 'button' || c.type === 'image') {
+      // images are decorative; only buttons are clickable controls
+      if (c.type === 'button') {
         if (x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h) {
           return { pageId: page.id, objId: c.id };
         }
