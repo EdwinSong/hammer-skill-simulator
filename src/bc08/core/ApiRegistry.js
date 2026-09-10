@@ -5,6 +5,9 @@ import { createDelayApi } from '../apis/delayApi.js';
 import { createNetApi } from '../apis/netApi.js';
 import { createStorageApi } from '../apis/storageApi.js';
 import { createSysApi } from '../apis/sysApi.js';
+import { createSystemApi } from '../apis/systemApi.js';
+import { createCapabilityApi } from '../apis/capabilityApi.js';
+import { createJsonApi } from '../apis/jsonApi.js';
 
 const { lua } = fengari;
 
@@ -33,7 +36,16 @@ export function createApiRegistry(runtime) {
       createSysApi(runtime).register(L);
       lua.lua_setglobal(L, 'sys');
 
-      lua.lua_pushliteral(L, '0.1');
+      createSystemApi(runtime).register(L);
+      lua.lua_setglobal(L, 'system');
+
+      createCapabilityApi(runtime).register(L);
+      lua.lua_setglobal(L, 'capability');
+
+      createJsonApi().register(L);
+      lua.lua_setglobal(L, 'json');
+
+      lua.lua_pushliteral(L, '0.2');
       lua.lua_setglobal(L, 'BC08_SIM_API');
     }
   };

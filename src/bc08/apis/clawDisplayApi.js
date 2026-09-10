@@ -113,6 +113,12 @@ export function createClawDisplayApi(runtime) {
       interop.push(L, SCR_H);
       return 2;
     },
+
+    change_page: (L) => {
+      const pageId = interop.tojs(L, 1);
+      runtime.changePage(Number(pageId));
+      return 0;
+    },
   };
 
   return {

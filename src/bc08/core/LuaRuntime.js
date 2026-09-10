@@ -112,6 +112,28 @@ export class LuaRuntime {
     lauxlib.luaL_requiref(this.L, to_luastring('js'), interop.luaopen_js, 1);
     lua.lua_pop(this.L, 1);
 
+    // Provide require() for documented native modules so skills that use
+    // `local capability = require("capability")` (as in API_REFERENCE.md) work.
+    const requireStub = (L2) => {
+      const name = String(interop.tojs(L2, 1) || '');
+      const allowed = ['capability', 'json', 'system', 'storage', 'delay'];
+      if (!allowed.includes(name)) {
+        lua.lua_pushnil(L2);
+        lua.lua_pushstring(L2, to_luastring(`module '${name}' not found`));
+        return 2;
+      }
+      lua.lua_getglobal(L2, name);
+      if (lua.lua_isnil(L2, -1)) {
+        lua.lua_pop(L2, 1);
+        lua.lua_createtable(L2, 0, 0);
+        lua.lua_pushvalue(L2, -1);
+        lua.lua_setglobal(L2, name);
+      }
+      return 1;
+    };
+    lua.lua_pushjsfunction(this.L, requireStub);
+    lua.lua_setglobal(this.L, 'require');
+
     lua.lua_atnativeerror(this.L, (L2) => {
       const err = interop.tojs(L2, 1);
       this.log('error', `Native error: ${err && err.stack ? err.stack : err}`);
@@ -287,6 +309,14 @@ export class LuaRuntime {
       this.log('error', `Callback error: ${msg}`);
       lua.lua_pop(this.L, 1);
     }
+  }
+
+  invokeCapabilityCallback(ref, ok, out, err) {
+    this.invokeCallback(ref, [ok, out, err]);
+  }
+
+  changePage(pageId) {
+    this.onScreenUpdate({ activePage: pageId, pages: this.getScreenState().pages });
   }
 
   stop() {

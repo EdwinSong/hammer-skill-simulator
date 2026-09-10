@@ -14,7 +14,6 @@ const BLOCKED_GLOBALS = [
   'dofile',
   'loadfile',
   'load',
-  'require',
   'js',
   'interop',
   'window',
@@ -71,6 +70,18 @@ function checkGlobals(code) {
     });
   }
 
+  // require() is only allowed for documented native modules.
+  const requireRegex = /\brequire\s*\(\s*["']([^"']+)["']\s*\)/g;
+  const allowedRequires = ['capability', 'json', 'system', 'storage', 'delay'];
+  for (const m of code.matchAll(requireRegex)) {
+    if (!allowedRequires.includes(m[1])) {
+      warnings.push({
+        level: 'error',
+        message: `Blocked require module: ${m[1]}`,
+      });
+    }
+  }
+
   return warnings;
 }
 
@@ -101,7 +112,9 @@ function checkDelayInLoops(code) {
 
 function checkApiUsage(code) {
   const warnings = [];
-  const apiCalls = [...code.matchAll(/\b(claw\.\w+\.\w+|delay\.\w+|sys\.\w+|net\.\w+|storage\.\w+)\s*\(/g)];
+  const apiCalls = [
+    ...code.matchAll(/\b(claw\.\w+\.\w+|delay\.\w+|sys\.\w+|net\.\w+|storage\.\w+|system\.\w+|system\.heap\.\w+|capability\.\w+|json\.\w+)\s*\(/g),
+  ];
   for (const match of apiCalls) {
     const call = match[1];
     if (!isKnownApi(call)) {
@@ -125,6 +138,7 @@ function isKnownApi(call) {
     'claw.display.image',
     'claw.display.pop_event',
     'claw.display.get_size',
+    'claw.display.change_page',
     'claw.rgb.set',
     'claw.rgb.set_mode',
     'claw.rgb.set_zone',
@@ -150,6 +164,18 @@ function isKnownApi(call) {
     'storage.exists',
     'storage.read_file',
     'storage.write_file',
+    'storage.listdir',
+    'storage.get_free_space',
+    'system.time',
+    'system.date',
+    'system.millis',
+    'system.uptime',
+    'system.ip',
+    'system.info',
+    'system.heap.get_info',
+    'capability.call',
+    'json.decode',
+    'json.encode',
   ];
   return known.includes(call);
 }
