@@ -112,6 +112,21 @@ export class LuaRuntime {
     lauxlib.luaL_requiref(this.L, to_luastring('js'), interop.luaopen_js, 1);
     lua.lua_pop(this.L, 1);
 
+    // API_REFERENCE.md examples use print(); route it to the Debug Log
+    // instead of the browser console / fengari stdout.
+    lua.lua_pushjsfunction(this.L, (L2) => {
+      const n = lua.lua_gettop(L2);
+      const parts = [];
+      for (let i = 1; i <= n; i++) {
+        lauxlib.luaL_tolstring(L2, i, null);
+        parts.push(String(interop.tojs(L2, -1)));
+        lua.lua_pop(L2, 1);
+      }
+      this.log('info', parts.join('\t'));
+      return 0;
+    });
+    lua.lua_setglobal(this.L, 'print');
+
     // Provide require() for documented native modules so skills that use
     // `local capability = require("capability")` (as in API_REFERENCE.md) work.
     const requireStub = (L2) => {

@@ -3,43 +3,89 @@ import * as interop from 'fengari-interop';
 
 const { lua, to_luastring } = fengari;
 
-const DEFAULT_SENSORS = {
-  hashrate: 14.25,
-  efficiency: 8.58,
-  cpu_temp: 48.5,
-  psu_temp: 52,
-  chip_temp_0: 65,
-  chip_temp_1: 67,
-  fan_rpm_0: 3800,
-  fan_rpm_1: 3750,
-  fan_percent_0: 100,
-  fan_percent_1: 100,
-  auto_fan_mode: true,
-  manual_fan_percent: 80,
-  input_voltage: 12.08,
-  voltage: 4.80,
-  out_voltage: 4.80,
-  out_current: 25.40,
-  power: 121.92,
-  max_power: 240.0,
-  nominal_input_voltage: 12,
-  best_diff: '15.8M',
-  latest_block_height: 860432,
-  latest_block_pool: 'ZSolo',
-  latest_block_reward: 3.125,
-  btc_price: 98520.0,
-  btc_change_pct: 2.35,
-  sn: 'BC08-P4-00123456',
+// ── Live miner simulation ────────────────────────────────────────────────
+// The real device reads these values from firmware shared memory. In the
+// simulator we emulate a running miner: values drift around their nominal
+// operating point so dashboards visibly update between refreshes.
+const sim = {
+  bootTime: Date.now(),
+  hashrate: 14.25,        // TH/s, random walk around nominal
+  btcPrice: 98520.0,      // USD, random walk
+  btcChangePct: 2.35,
+  baseBlockHeight: 860432,
 };
 
-const DEFAULT_STATUS = {
-  frequency: 500,
-  voltage: 480,
-  work_mode: 'Normal',
-  pool: 'solo.ckpool.org:3333',
-  worker: '1A1zP1eP5QGefi2D...bc08',
-  uptime_s: 86400,
-};
+function rnd(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function drift(current, step, min, max) {
+  const next = current + rnd(-step, step);
+  return Math.max(min, Math.min(max, next));
+}
+
+function round2(v) {
+  return Math.round(v * 100) / 100;
+}
+
+function simulateSensors() {
+  sim.hashrate = drift(sim.hashrate, 0.35, 12.5, 16.0);
+  sim.btcPrice = drift(sim.btcPrice, sim.btcPrice * 0.0015, 80000, 120000);
+  sim.btcChangePct = drift(sim.btcChangePct, 0.15, -8, 8);
+
+  const chipTemp0 = Math.round(rnd(62, 71));
+  const chipTemp1 = chipTemp0 + Math.round(rnd(0, 3));
+  const hottest = Math.max(chipTemp0, chipTemp1);
+  // Auto fan curve: hotter chips -> faster fans.
+  const fanPercent = Math.max(55, Math.min(100, Math.round(55 + (hottest - 60) * 5)));
+  const fanRpm0 = Math.round(2400 + fanPercent * 18 + rnd(-80, 80));
+  const fanRpm1 = fanRpm0 + Math.round(rnd(-120, 60));
+
+  const efficiency = drift(8.58, 0.12, 7.8, 9.6); // J/TH
+  const power = round2(sim.hashrate * efficiency + rnd(-3, 3));
+  const voltage = round2(drift(4.8, 0.01, 4.75, 4.85));
+
+  return {
+    hashrate: round2(sim.hashrate),
+    efficiency: round2(efficiency),
+    cpu_temp: round2(drift(48.5, 1.5, 44, 58)),
+    psu_temp: Math.round(rnd(50, 55)),
+    chip_temp_0: chipTemp0,
+    chip_temp_1: chipTemp1,
+    fan_rpm_0: fanRpm0,
+    fan_rpm_1: fanRpm1,
+    fan_percent_0: fanPercent,
+    fan_percent_1: fanPercent,
+    auto_fan_mode: true,
+    manual_fan_percent: 80,
+    input_voltage: round2(drift(12.08, 0.05, 11.9, 12.2)),
+    voltage,
+    out_voltage: voltage,
+    out_current: round2(power / Math.max(0.1, voltage)),
+    power,
+    max_power: 240.0,
+    nominal_input_voltage: 12,
+    best_diff: '15.8M',
+    // A new block is found roughly every 10 minutes.
+    latest_block_height: sim.baseBlockHeight + Math.floor((Date.now() - sim.bootTime) / 600000),
+    latest_block_pool: 'ZSolo',
+    latest_block_reward: 3.125,
+    btc_price: round2(sim.btcPrice),
+    btc_change_pct: round2(sim.btcChangePct),
+    sn: 'BC08-P4-00123456',
+  };
+}
+
+function simulateStatus() {
+  return {
+    frequency: 500,
+    voltage: 480,
+    work_mode: 'Normal',
+    pool: 'solo.ckpool.org:3333',
+    worker: '1A1zP1eP5QGefi2D...bc08',
+    uptime_s: Math.floor((Date.now() - sim.bootTime) / 1000),
+  };
+}
 
 const DEFAULT_SYSTEM_INFO = {
   hostname: 'bc08-miner',
@@ -56,8 +102,8 @@ const DEFAULT_SYSTEM_INFO = {
 };
 
 const DEFAULT_POOLS = {
-  primary: { url: 'solo.ckpool.org', port: 3333, user: '...', pass: 'x' },
-  backup: { url: 'pool.vkbit.com', port: 3333, user: '...', pass: 'x' },
+  primary: { url: 'solo.ckpool.org', port: 3333, user: '1A1zP1eP5QGefi2D...bc08', pass: 'x' },
+  backup: { url: 'pool.vkbit.com', port: 3333, user: '1A1zP1eP5QGefi2D...bc08', pass: 'x' },
 };
 
 function pushString(L, s) {
@@ -91,8 +137,8 @@ export function createCapabilityApi(runtime) {
   }
 
   const capabilities = {
-    miner_get_sensors: () => ({ ok: true, out: JSON.stringify(DEFAULT_SENSORS) }),
-    miner_get_status: () => ({ ok: true, out: JSON.stringify(DEFAULT_STATUS) }),
+    miner_get_sensors: () => ({ ok: true, out: JSON.stringify(simulateSensors()) }),
+    miner_get_status: () => ({ ok: true, out: JSON.stringify(simulateStatus()) }),
     miner_get_system_info: () => ({ ok: true, out: JSON.stringify(DEFAULT_SYSTEM_INFO) }),
     miner_get_pools: () => ({ ok: true, out: JSON.stringify(DEFAULT_POOLS) }),
 

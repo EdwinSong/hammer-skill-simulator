@@ -1,9 +1,10 @@
 {
-  "generated_at": "2026-09-09T07:03:58Z",
+  "generated_at": "2026-09-11T03:25:17Z",
   "total": 3,
   "skills": [
     {
       "id": "game_minesweeper",
+      "dir": "game_minesweeper",
       "title": "Game MineSweeper",
       "description": "Run a premium animated Minesweeper game on the board LCD with 5x5 grid, multiple levels (1-5), flag mode, explosion ripple animation, and victory celebration screen. Touch-driven with dark-themed LVGL UI.",
       "author": "HammerMiner",
@@ -35,6 +36,7 @@
     },
     {
       "id": "miner_dashboard",
+      "dir": "miner_dashboard",
       "title": "Bitcoin Miner Dashboard",
       "description": "Display a clean, card-based Bitcoin miner dashboard with hashrate, temperature, BTC price, network status, mining config, ASIC config, and system info on the board LCD.",
       "author": "HammerMiner",
@@ -54,8 +56,8 @@
       "cap_groups": [
         "cap_lua"
       ],
-      "total_size": 32472,
-      "sha256": "ae3f978098d52af26fe7a7fc72b1a8bb85edf91ef9cff4494c451bd0a07f7a22",
+      "total_size": 34985,
+      "sha256": "12d49fe9ccfd33940230188b56238af486159b7ce7093e8b70b5eb2ea3737a72",
       "files": [
         "SKILL.md",
         "assets\\asic.png",
@@ -78,8 +80,9 @@
       "path": "/skills/hammer-claw-skills-lab/skills/miner_dashboard"
     },
     {
-      "id": "watercooling_light_timer",
-      "title": "Water-cooling Light Timer",
+      "id": "hydro_light_control",
+      "dir": "watercooling_light_timer",
+      "title": "Hydro Light Control",
       "description": "Schedule the BC08-P4 water-cooling RGB LED to turn off after a delay (minutes or hours) or at a specific clock time. Supports state persistence and shows current timezone. Invoke when the user asks for LED timer, schedule light off, water-cooling RGB shutdown, or turn off the light after a delay.",
       "author": "HammerMiner",
       "category": "utility",
@@ -92,36 +95,61 @@
         "bc08-p4"
       ],
       "peripherals": [
-        "led"
+        "display",
+        "argb_led"
       ],
       "cap_groups": [
         "cap_lua"
       ],
-      "total_size": 52031,
-      "sha256": "48d4bd50944f3ce190f637aaf94d008398ca70e2f916157374712aeffdd5d0c8",
+      "total_size": 165040,
+      "sha256": "b2e0f8906bf0be881c757280541780ad579dd599488a1430de6383f1b3a6a129",
       "files": [
         "SKILL.md",
+        "assets\\_debug_stop.png",
+        "assets\\btn_minus.png",
         "assets\\btn_minus2.png",
+        "assets\\btn_plus.png",
         "assets\\btn_plus2.png",
         "assets\\btn_start2.png",
         "assets\\btn_stop.png",
+        "assets\\chevron_down.png",
+        "assets\\chevron_up.png",
         "assets\\clock.png",
         "assets\\color_dot_blue.png",
         "assets\\color_dot_cyan.png",
         "assets\\color_dot_pink.png",
         "assets\\color_dot_purple.png",
+        "assets\\digit_0.png",
+        "assets\\digit_1.png",
+        "assets\\digit_2.png",
+        "assets\\digit_3.png",
+        "assets\\digit_4.png",
+        "assets\\digit_5.png",
+        "assets\\digit_6.png",
+        "assets\\digit_7.png",
+        "assets\\digit_8.png",
+        "assets\\digit_9.png",
+        "assets\\digit_colon.png",
         "assets\\hours.png",
         "assets\\led.png",
         "assets\\light_ball.png",
+        "assets\\light_ball_blue.png",
+        "assets\\light_ball_cyan.png",
+        "assets\\light_ball_pink.png",
+        "assets\\light_ball_purple.png",
         "assets\\minutes.png",
         "assets\\mode_btn.png",
         "assets\\mode_btn_active.png",
         "assets\\power_btn.png",
+        "assets\\preset_active.png",
         "assets\\preset_btn.png",
         "assets\\preset_btn_active.png",
+        "assets\\preset_inactive.png",
         "assets\\ring_bg.png",
+        "assets\\start_btn.png",
+        "assets\\stop_btn.png",
         "assets\\timer.png",
-        "generate_preview.py",
+        "assets\\title_aqua_core.png",
         "preview.png",
         "scripts\\watercooling_light_timer.lua"
       ],

@@ -1,4 +1,5 @@
 import * as fengari from 'fengari';
+import * as interop from 'fengari-interop';
 
 const { lua, lauxlib, to_luastring } = fengari;
 
@@ -36,7 +37,7 @@ function checkSyntax(code) {
     const status = lauxlib.luaL_loadstring(L, to_luastring(code));
     if (status !== lua.LUA_OK) {
       const top = lua.lua_gettop(L);
-      const msg = fengari.interop.tojs(L, top);
+      const msg = interop.tojs(L, top);
       return { ok: false, error: `Syntax error: ${msg}` };
     }
     return { ok: true };

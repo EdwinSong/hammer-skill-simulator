@@ -8,7 +8,8 @@ export function createStorageApi() {
 
   const api = {
     get_root_dir: (L) => {
-      interop.push(L, '/bc08');
+      // API_REFERENCE.md: persistent flash storage is mounted under /fatfs.
+      interop.push(L, '/fatfs');
       return 1;
     },
 

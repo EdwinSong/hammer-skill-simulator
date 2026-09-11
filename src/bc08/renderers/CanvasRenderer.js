@@ -75,7 +75,16 @@ function resolveImagePath(path) {
   if (/^[A-Za-z]:/.test(p)) {
     p = p.substring(2);
   }
-  if (p.startsWith('/')) return p;
+  // Device flash root (/fatfs) maps to the simulator public root, so
+  // "/fatfs/skills/<id>/assets/x.png" resolves like "skills/<id>/assets/x.png".
+  if (p === '/fatfs') {
+    p = '/';
+  } else if (p.startsWith('/fatfs/')) {
+    p = p.substring('/fatfs'.length);
+  }
+  if (p.startsWith('/')) {
+    p = p.substring(1);
+  }
   // Imported skills may provide a data URL for this exact normalized path
   if (p.startsWith('skills/') && importedImageMap[p]) {
     return importedImageMap[p];

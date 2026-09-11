@@ -25,21 +25,23 @@ export function createSystemApi(runtime) {
     },
 
     date: (fmt) => {
-      if (fmt && fmt !== '*t') {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
-      }
+      // API_REFERENCE.md: system.date() returns a formatted local date
+      // string (default "%Y-%m-%d %H:%M:%S"). "*t" is kept as an extension
+      // returning a broken-down table for convenience.
       const d = new Date();
-      return {
-        year: d.getFullYear(),
-        month: d.getMonth() + 1,
-        day: d.getDate(),
-        hour: d.getHours(),
-        min: d.getMinutes(),
-        sec: d.getSeconds(),
-        wday: d.getDay() + 1,
-        yday: 0,
-      };
+      if (fmt === '*t') {
+        return {
+          year: d.getFullYear(),
+          month: d.getMonth() + 1,
+          day: d.getDate(),
+          hour: d.getHours(),
+          min: d.getMinutes(),
+          sec: d.getSeconds(),
+          wday: d.getDay() + 1,
+          yday: 0,
+        };
+      }
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
     },
 
     millis: () => {
