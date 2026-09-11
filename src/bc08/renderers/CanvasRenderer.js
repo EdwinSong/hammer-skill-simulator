@@ -112,12 +112,23 @@ function getImage(path) {
 function drawImage(ctx, c) {
   const img = getImage(c.path);
   if (img && img.complete && img.naturalWidth > 0) {
-    ctx.drawImage(img, c.x, c.y, c.w, c.h);
+    const naturalW = img.naturalWidth;
+    const naturalH = img.naturalHeight;
+    const reqW = c.w;
+    const reqH = c.h;
+    if ((reqW && reqW !== naturalW) || (reqH && reqH !== naturalH)) {
+      console.warn(
+        `[simulator] image size mismatch: ${c.path} requested ${reqW}x${reqH} but native is ${naturalW}x${naturalH}`
+      );
+    }
+    // Match real device behavior: images are drawn at their native pixel
+    // size; the w/h arguments passed from Lua are ignored.
+    ctx.drawImage(img, c.x, c.y, naturalW, naturalH);
     return;
   }
   ctx.strokeStyle = '#888888';
   ctx.lineWidth = 2;
-  ctx.strokeRect(c.x, c.y, c.w, c.h);
+  ctx.strokeRect(c.x, c.y, c.w || 48, c.h || 48);
   ctx.fillStyle = '#888888';
   ctx.font = '16px sans-serif';
   ctx.textAlign = 'left';
