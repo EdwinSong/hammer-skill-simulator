@@ -8,6 +8,19 @@ function checkPage(runtime, pageId) {
   return runtime.pages.get(pageId) || { title: '', controls: [] };
 }
 
+// Upsert: replace an existing control with the same id, or append if new.
+function upsertControl(runtime, pageId, control) {
+  const page = checkPage(runtime, pageId);
+  const idx = page.controls.findIndex((c) => c.id === control.id);
+  if (idx >= 0) {
+    const next = [...page.controls];
+    next[idx] = control;
+    runtime.setPage(pageId, { ...page, controls: next });
+  } else {
+    runtime.setPage(pageId, { ...page, controls: [...page.controls, control] });
+  }
+}
+
 export function createClawDisplayApi(runtime) {
   const api = {
     create_page: (L) => {
@@ -42,8 +55,7 @@ export function createClawDisplayApi(runtime) {
         text: String(interop.tojs(L, 7) || ''),
         color: Number(interop.tojs(L, 8) || 0),
       };
-      const page = checkPage(runtime, pageId);
-      runtime.setPage(pageId, { ...page, controls: [...page.controls, control] });
+      upsertControl(runtime, pageId, control);
       return 0;
     },
 
@@ -58,8 +70,7 @@ export function createClawDisplayApi(runtime) {
         color: Number(interop.tojs(L, 6) || 0),
         font_size: Number(interop.tojs(L, 7) || 24),
       };
-      const page = checkPage(runtime, pageId);
-      runtime.setPage(pageId, { ...page, controls: [...page.controls, control] });
+      upsertControl(runtime, pageId, control);
       return 0;
     },
 
@@ -75,8 +86,7 @@ export function createClawDisplayApi(runtime) {
         color: Number(interop.tojs(L, 7) || 0),
         radius: Number(interop.tojs(L, 8) || 0),
       };
-      const page = checkPage(runtime, pageId);
-      runtime.setPage(pageId, { ...page, controls: [...page.controls, control] });
+      upsertControl(runtime, pageId, control);
       return 0;
     },
 
@@ -91,8 +101,7 @@ export function createClawDisplayApi(runtime) {
         h: interop.tojs(L, 6) || 0,
         path: String(interop.tojs(L, 7) || ''),
       };
-      const page = checkPage(runtime, pageId);
-      runtime.setPage(pageId, { ...page, controls: [...page.controls, control] });
+      upsertControl(runtime, pageId, control);
       return 0;
     },
 
