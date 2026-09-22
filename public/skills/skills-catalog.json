@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-22T08:54:28Z",
+  "generated_at": "2026-09-22T10:31:51Z",
   "total": 3,
   "skills": [
     {
@@ -103,8 +103,8 @@
       "cap_groups": [
         "cap_lua"
       ],
-      "total_size": 185155,
-      "sha256": "933df63a615885c071bea5425fff0294749fce369c24b4919a327847632f5996",
+      "total_size": 185473,
+      "sha256": "18830556f8b01f8d1583ae55d9bb9394c2cb91dac08f66de34ed4856ff53376f",
       "files": [
         "SKILL.md",
         "_metadata.json",
